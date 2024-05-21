@@ -36,6 +36,44 @@ def networked_data_relay():
             # Close the connection
             client_socket.close()
 
+def network_data_relay():
+    # Create a TCP socket object
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Get the port number for the "http" service
+    port = socket.getservbyname("http")
+
+    # Define the server address and TCP port
+    server_address = ('localhost', port)
+
+    # Bind the socket to the address
+    server_socket.bind(server_address)
+
+    # Listen for incoming connections
+    server_socket.listen(5)
+
+    print("Server is listening on TCP port", port, "...")
+
+    while True:
+        # Wait for a connection
+        client_socket, client_address = server_socket.accept()
+
+        try:
+            print("Connection from:", client_address)
+
+            # Receive data from the client
+            data = client_socket.recv(1024)
+            print("Received data:", data.decode())
+
+            # Relay the data back to the client
+            client_socket.sendall(data)
+
+        finally:
+            # Close the connection
+            client_socket.close()
+
+# Call the function to start the server
+networked_data_relay()
 @app.route('/relay', methods=['POST'])
 def relay_data():
     data = request.get_data()
